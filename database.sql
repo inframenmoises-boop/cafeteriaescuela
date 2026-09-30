@@ -1,0 +1,34 @@
+CREATE DATABASE IF NOT EXISTS concesionaria;
+USE concesionaria;
+
+CREATE TABLE IF NOT EXISTS automoviles (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  marca VARCHAR(100) NOT NULL,
+  modelo VARCHAR(100) NOT NULL,
+  anio INT NOT NULL,
+  precio DECIMAL(12,2) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS clientes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(100) NOT NULL,
+  telefono VARCHAR(30) NOT NULL,
+  email VARCHAR(150) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS ventas (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  cliente_id INT NOT NULL,
+  automovil_id INT NOT NULL,
+  precio_venta DECIMAL(12,2) NOT NULL,
+  fecha_venta TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_venta_automovil (automovil_id),
+  CONSTRAINT fk_ventas_cliente
+    FOREIGN KEY (cliente_id) REFERENCES clientes(id)
+    ON DELETE CASCADE,
+  CONSTRAINT fk_ventas_automovil
+    FOREIGN KEY (automovil_id) REFERENCES automoviles(id)
+    ON DELETE CASCADE
+);
