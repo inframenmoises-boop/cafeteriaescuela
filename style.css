@@ -1,19 +1,24 @@
-:root {
-  color-scheme: light;
+﻿:root {
+  color-scheme: dark;
   font-family: "Avenir Next", "Segoe UI", sans-serif;
-  color: #1c302b;
-  background: #f4f6f1;
+  color: #f3ecff;
+  background: #0e0d16;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
-  --color-ink: #1c302b;
-  --color-muted: #66756f;
-  --color-paper: #ffffff;
-  --color-line: #dce4dd;
-  --color-green: #176b52;
-  --color-green-dark: #104b3b;
-  --color-coral: #c9523f;
-  --color-yellow: #f1c65b;
-  --shadow-soft: 0 14px 36px rgb(24 54 43 / 8%);
+  --color-ink: #f3ecff;
+  --color-muted: #b6acd4;
+  --color-paper: #171522;
+  --color-line: rgba(160, 140, 214, 0.25);
+  --color-green: #7c5cff;
+  --color-green-dark: #5d38d8;
+  --color-coral: #c77df5;
+  --color-yellow: #b58cff;
+  --shadow-soft: 0 20px 50px rgba(12, 10, 19, 0.6);
+  --bg-page: #0c0b12;
+  --bg-soft: #1a1526;
+  --panel-soft: #201a2f;
+  --panel-alt: #120f1a;
+  --purple-glow: rgba(124, 92, 255, 0.18);
 }
 
 *,
@@ -26,11 +31,10 @@ body {
   min-width: 320px;
   min-height: 100vh;
   margin: 0;
-  background-color: #f4f6f1;
-  background-image: linear-gradient(135deg, rgb(23 107 82 / 3%) 25%, transparent 25%),
-    linear-gradient(315deg, rgb(201 82 63 / 3%) 25%, transparent 25%);
-  background-position: 0 0, 18px 18px;
-  background-size: 36px 36px;
+  background:
+    radial-gradient(circle at top left, rgba(124, 92, 255, 0.24), transparent 30%),
+    radial-gradient(circle at bottom right, rgba(199, 125, 245, 0.16), transparent 25%),
+    var(--bg-page);
 }
 
 button,
@@ -57,8 +61,8 @@ button {
   gap: 24px;
   padding: 18px 22px;
   border: 1px solid var(--color-line);
-  border-radius: 8px;
-  background: var(--color-paper);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(23, 21, 34, 0.98), rgba(16, 13, 23, 0.98));
   box-shadow: var(--shadow-soft);
 }
 
@@ -75,12 +79,13 @@ button {
   width: 44px;
   aspect-ratio: 1;
   place-items: center;
-  border-radius: 8px;
-  background: var(--color-yellow);
-  color: var(--color-ink);
+  border-radius: 10px;
+  background: linear-gradient(135deg, #8f6dff, #5228cc);
+  color: #fff;
   font-family: Georgia, serif;
   font-size: 23px;
   font-weight: 700;
+  box-shadow: 0 10px 20px rgba(124, 92, 255, 0.32);
 }
 
 .cafeteria-brand__name {
@@ -113,8 +118,8 @@ button {
 
 .cafeteria-nav a[aria-current="page"],
 .cafeteria-nav a:hover {
-  background: #e7f1eb;
-  color: var(--color-green-dark);
+  background: rgba(124, 92, 255, 0.18);
+  color: #f3ecff;
 }
 
 .cafeteria-main {
@@ -145,8 +150,8 @@ button {
 .cafeteria-toolbar,
 .cafeteria-panel {
   border: 1px solid var(--color-line);
-  border-radius: 8px;
-  background: var(--color-paper);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(26, 21, 38, 0.98), rgba(17, 14, 24, 0.98));
   box-shadow: var(--shadow-soft);
 }
 
@@ -179,11 +184,12 @@ button {
   width: 100%;
   min-height: 42px;
   padding: 10px 12px;
-  border: 1px solid #cbd7cf;
-  border-radius: 6px;
+  border: 1px solid rgba(160, 140, 214, 0.25);
+  border-radius: 10px;
   outline: none;
-  background: #fff;
+  background: rgba(14, 12, 20, 0.9);
   color: var(--color-ink);
+  transition: border-color 140ms ease, box-shadow 140ms ease, background 140ms ease;
 }
 
 .cafeteria-field input:focus,
@@ -202,30 +208,33 @@ button {
   gap: 8px;
   padding: 10px 15px;
   border: 1px solid transparent;
-  border-radius: 6px;
+  border-radius: 10px;
   font-size: 14px;
   font-weight: 700;
   text-decoration: none;
-  transition: background-color 140ms ease, transform 140ms ease;
+  transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease;
 }
 
 .cafeteria-button:hover {
   transform: translateY(-1px);
+  filter: brightness(1.04);
 }
 
 .cafeteria-button--primary {
-  background: var(--color-green);
+  background: linear-gradient(135deg, #7c5cff, #5a39d0);
   color: #fff;
+  box-shadow: 0 10px 18px rgba(92, 62, 196, 0.28);
 }
 
 .cafeteria-button--primary:hover {
-  background: var(--color-green-dark);
+  background: linear-gradient(135deg, #8d72ff, #6c45eb);
 }
 
 .cafeteria-button--secondary {
-  border-color: var(--color-line);
-  background: #fff;
+  border-color: rgba(160, 140, 214, 0.3);
+  background: rgba(124, 92, 255, 0.12);
   color: var(--color-ink);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .cafeteria-button--danger {
@@ -266,12 +275,12 @@ button {
 .cafeteria-table th,
 .cafeteria-table td {
   padding: 13px 18px;
-  border-bottom: 1px solid #e8ede9;
+  border-bottom: 1px solid rgba(160, 140, 214, 0.18);
   white-space: nowrap;
 }
 
 .cafeteria-table th {
-  background: #f7f9f6;
+  background: rgba(124, 92, 255, 0.08);
   color: var(--color-muted);
   font-size: 12px;
   font-weight: 700;
@@ -288,7 +297,7 @@ button {
 }
 
 .cafeteria-table tbody tr:hover {
-  background: #fbfcfa;
+  background: rgba(124, 92, 255, 0.06);
 }
 
 .cafeteria-status {
@@ -373,13 +382,13 @@ button {
 
 .cafeteria-nav .nav-link:hover,
 .cafeteria-nav .nav-link.is-active {
-  background: #e7f1eb;
-  color: var(--color-green-dark);
+  background: rgba(124, 92, 255, 0.18);
+  color: #f3ecff;
 }
 
 .eyebrow {
   margin: 0 0 8px;
-  color: var(--color-green);
+  color: #b59dff;
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -406,15 +415,7 @@ button {
 }
 
 .notice {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin: 0 0 18px;
-  padding: 12px 15px;
-  border: 1px solid;
-  border-radius: 6px;
-  font-size: 14px;
+  display: none !important;
 }
 
 .notice button {
@@ -469,14 +470,14 @@ button {
   min-width: 0;
   padding: 18px 20px;
   border: 1px solid var(--color-line);
-  border-radius: 8px;
-  background: var(--color-paper);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(24, 20, 35, 0.98), rgba(16, 13, 23, 0.98));
   box-shadow: var(--shadow-soft);
 }
 
-.stat-card--green { border-top: 3px solid var(--color-green); }
-.stat-card--yellow { border-top: 3px solid var(--color-yellow); }
-.stat-card--coral { border-top: 3px solid var(--color-coral); }
+.stat-card--green { border-top: 3px solid #8a6bff; }
+.stat-card--yellow { border-top: 3px solid #b68ef7; }
+.stat-card--coral { border-top: 3px solid #d6aef9; }
 
 .stat-card__top {
   display: flex;
@@ -494,12 +495,12 @@ button {
   height: 36px;
   place-items: center;
   border-radius: 7px;
-  background: #edf4ef;
-  color: var(--color-green);
+  background: rgba(124, 92, 255, 0.15);
+  color: #ab95ff;
 }
 
-.stat-card--yellow .stat-icon { background: #fff5d9; color: #967112; }
-.stat-card--coral .stat-icon { background: #fff0ed; color: var(--color-coral); }
+.stat-card--yellow .stat-icon { background: rgba(181, 140, 255, 0.15); color: #c9aefb; }
+.stat-card--coral .stat-icon { background: rgba(199, 125, 245, 0.16); color: #e2b7ff; }
 
 .stat-card > strong {
   display: block;
@@ -556,10 +557,11 @@ button {
 
 .quick-panel {
   padding: 22px;
-  border-radius: 8px;
-  background: var(--color-green-dark);
+  border-radius: 12px;
+  background: linear-gradient(180deg, #241d38, #160f22);
   color: #fff;
   box-shadow: var(--shadow-soft);
+  border: 1px solid rgba(156, 128, 246, 0.35);
 }
 
 .quick-panel__illustration {
@@ -590,11 +592,11 @@ button {
 }
 
 .quick-panel .cafeteria-button--primary {
-  background: var(--color-yellow);
-  color: var(--color-ink);
+  background: linear-gradient(135deg, #8c6dff, #6849df);
+  color: #fff;
 }
 
-.quick-panel .cafeteria-button--primary:hover { background: #f8d779; }
+.quick-panel .cafeteria-button--primary:hover { background: linear-gradient(135deg, #9b7eff, #7659eb); }
 
 .quick-panel__foot {
   display: flex;
@@ -706,6 +708,12 @@ button {
 
 .form-submit { width: 100%; }
 
+.form-actions {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.6fr) minmax(0, 1.4fr);
+  gap: 10px;
+}
+
 .form-note {
   display: flex;
   align-items: center;
@@ -729,8 +737,9 @@ button {
   gap: 7px;
   padding: 0 9px;
   border: 1px solid var(--color-line);
-  border-radius: 6px;
+  border-radius: 10px;
   color: var(--color-muted);
+  background: rgba(124, 92, 255, 0.04);
 }
 
 .search-control input {
@@ -763,6 +772,66 @@ button {
 }
 
 .app-footer span:first-child { color: var(--color-green); font-weight: 800; letter-spacing: 0.1em; }
+
+.confirmation-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  background: rgba(9, 8, 12, 0.72);
+  backdrop-filter: blur(3px);
+}
+
+.confirmation-modal {
+  width: min(520px, calc(100% - 32px));
+  padding: 18px 20px 20px;
+  border: 1px solid rgba(160, 140, 214, 0.26);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(25, 20, 36, 0.98), rgba(13, 11, 20, 0.98));
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.55);
+}
+
+.confirmation-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.confirmation-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.modal-close {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(124, 92, 255, 0.12);
+  color: var(--color-ink);
+}
+
+.confirmation-message {
+  margin: 0 0 18px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.confirmation-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.confirmation-actions .cafeteria-button {
+  min-width: 120px;
+}
 
 .sr-only {
   position: absolute;

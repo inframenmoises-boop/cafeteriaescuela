@@ -16,9 +16,14 @@ import {
 } from 'lucide-react';
 import '../style.css';
 
-const currency = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
+const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
 const dateLabel = new Intl.DateTimeFormat('es-MX', { day: '2-digit', month: 'short', year: 'numeric' });
 const today = () => new Date().toISOString().slice(0, 10);
+
+function clearForm(form) {
+  if (!form) return;
+  form.reset();
+}
 
 const pages = [
   { id: 'resumen', label: 'Resumen', icon: LayoutDashboard },
@@ -43,6 +48,7 @@ function App() {
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [confirmDelete, setConfirmDelete] = useState(null);
 
   async function loadData() {
     setLoading(true);
@@ -91,15 +97,21 @@ function App() {
   }
 
   async function removeRecord(endpoint, description) {
-    if (!window.confirm(`¿Eliminar ${description}?`)) return;
+    setConfirmDelete({ endpoint, description });
+  }
+
+  async function confirmRemoval() {
+    if (!confirmDelete) return;
     setError('');
     setNotice('');
     try {
-      await request(endpoint, { method: 'DELETE' });
+      await request(confirmDelete.endpoint, { method: 'DELETE' });
       setNotice('Registro eliminado.');
       await loadData();
     } catch (removeError) {
       setError(removeError.message);
+    } finally {
+      setConfirmDelete(null);
     }
   }
 
@@ -148,19 +160,6 @@ function App() {
             <RefreshCw size={16} className={loading ? 'spin' : ''} /> Actualizar
           </button>
         </div>
-
-        {error && (
-          <div className="notice notice--error" role="alert">
-            <span><strong>No se pudo conectar:</strong> {error}. Revisa que el servidor esté activo y la base de datos configurada.</span>
-            <button aria-label="Cerrar aviso" onClick={() => setError('')} type="button"><X size={18} /></button>
-          </div>
-        )}
-        {notice && (
-          <div className="notice notice--success" role="status">
-            <span>{notice}</span>
-            <button aria-label="Cerrar aviso" onClick={() => setNotice('')} type="button"><X size={18} /></button>
-          </div>
-        )}
 
         {loading && !data.productos.length && !data.estudiantes.length ? (
           <div className="loading-state"><LoaderCircle className="spin" size={28} /><span>Conectando con la cafetería...</span></div>
@@ -219,7 +218,10 @@ function App() {
                       <Field label="Fecha"><input name="fecha" type="date" defaultValue={today()} required /></Field>
                     </div>
                     {(!data.estudiantes.length || !data.productos.length) && <p className="form-hint">Agrega estudiantes y productos antes de registrar ventas.</p>}
-                    <button className="cafeteria-button cafeteria-button--primary form-submit" disabled={saving || !data.estudiantes.length || !data.productos.length} type="submit"><Plus size={17} /> {saving ? 'Guardando...' : 'Guardar venta'}</button>
+                    <div className="form-actions">
+                      <button className="cafeteria-button cafeteria-button--secondary form-submit" onClick={(event) => { event.preventDefault(); clearForm(event.currentTarget.form); }} type="button">Limpiar</button>
+                      <button className="cafeteria-button cafeteria-button--primary form-submit" disabled={saving || !data.estudiantes.length || !data.productos.length} type="submit"><Plus size={17} /> {saving ? 'Guardando...' : 'Guardar venta'}</button>
+                    </div>
                   </form>
                   <div className="form-note"><span className="live-dot" /> El total se calcula con el precio del producto.</div>
                 </section>
@@ -236,8 +238,11 @@ function App() {
                   <div className="cafeteria-panel__heading"><div><p className="eyebrow">CATÁLOGO</p><h2>Agregar producto</h2></div><span className="form-heading-icon"><Coffee size={19} /></span></div>
                   <form className="record-form" onSubmit={(event) => saveForm(event, '/api/productos', (values) => ({ nombre: values.nombre.trim(), precio: Number(values.precio) }), 'Producto agregado al catálogo.')}>
                     <Field label="Nombre"><input name="nombre" placeholder="Ej. Mollete" maxLength="100" required /></Field>
-                    <Field label="Precio (MXN)"><input name="precio" type="number" min="0" step="0.01" placeholder="0.00" required /></Field>
-                    <button className="cafeteria-button cafeteria-button--primary form-submit" disabled={saving} type="submit"><Plus size={17} /> {saving ? 'Guardando...' : 'Agregar producto'}</button>
+                    <Field label="Precio (USD)"><input name="precio" type="number" min="0" step="0.01" placeholder="0.00" required /></Field>
+                    <div className="form-actions">
+                      <button className="cafeteria-button cafeteria-button--secondary form-submit" onClick={(event) => { event.preventDefault(); clearForm(event.currentTarget.form); }} type="button">Limpiar</button>
+                      <button className="cafeteria-button cafeteria-button--primary form-submit" disabled={saving} type="submit"><Plus size={17} /> {saving ? 'Guardando...' : 'Agregar producto'}</button>
+                    </div>
                   </form>
                 </section>
                 <section className="cafeteria-panel">
@@ -257,7 +262,10 @@ function App() {
                   <form className="record-form" onSubmit={(event) => saveForm(event, '/api/estudiantes', (values) => ({ nombre: values.nombre.trim(), grupo: values.grupo.trim() }), 'Estudiante agregado al padrón.')}>
                     <Field label="Nombre completo"><input name="nombre" placeholder="Ej. Ana López" maxLength="100" required /></Field>
                     <Field label="Grupo"><input name="grupo" placeholder="Ej. 1A" maxLength="50" required /></Field>
-                    <button className="cafeteria-button cafeteria-button--primary form-submit" disabled={saving} type="submit"><Plus size={17} /> {saving ? 'Guardando...' : 'Agregar estudiante'}</button>
+                    <div className="form-actions">
+                      <button className="cafeteria-button cafeteria-button--secondary form-submit" onClick={(event) => { event.preventDefault(); clearForm(event.currentTarget.form); }} type="button">Limpiar</button>
+                      <button className="cafeteria-button cafeteria-button--primary form-submit" disabled={saving} type="submit"><Plus size={17} /> {saving ? 'Guardando...' : 'Agregar estudiante'}</button>
+                    </div>
                   </form>
                 </section>
                 <section className="cafeteria-panel">
@@ -273,6 +281,24 @@ function App() {
         )}
       </main>
       <footer className="app-footer"><span>CAFETERÍA ESCOLAR</span><span>Control diario · {new Date().getFullYear()}</span></footer>
+
+      {confirmDelete && (
+        <div className="confirmation-overlay" onClick={() => setConfirmDelete(null)} role="presentation">
+          <div className="confirmation-modal" onClick={(event) => event.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+            <div className="confirmation-header">
+              <h3 id="confirm-title">Confirmación</h3>
+              <button aria-label="Cerrar confirmación" className="modal-close" onClick={() => setConfirmDelete(null)} type="button">
+                <X size={18} />
+              </button>
+            </div>
+            <p className="confirmation-message">¿Eliminar {confirmDelete.description}?</p>
+            <div className="confirmation-actions">
+              <button className="cafeteria-button cafeteria-button--primary" onClick={confirmRemoval} type="button">Aceptar</button>
+              <button className="cafeteria-button cafeteria-button--secondary" onClick={() => setConfirmDelete(null)} type="button">Cancelar</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
