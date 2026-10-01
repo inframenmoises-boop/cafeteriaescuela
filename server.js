@@ -10,14 +10,15 @@ const app = express();
 app.use(express.json());
 
 const caValue = process.env.DB_SSL_CA;
+const caContent = caValue && caValue.includes('-----BEGIN CERTIFICATE-----')
+  ? caValue.replace(/\\n/g, '\n')
+  : caValue && fs.existsSync(caValue)
+    ? fs.readFileSync(caValue, 'utf8')
+    : undefined;
 const ssl = process.env.DB_SSL === 'true'
   ? {
       rejectUnauthorized: true,
-      ...(caValue ? {
-        ca: caValue.includes('-----BEGIN CERTIFICATE-----')
-          ? caValue.replace(/\\n/g, '\n')
-          : fs.readFileSync(caValue, 'utf8')
-      } : {})
+      ...(caContent ? { ca: caContent } : {})
     }
   : undefined;
 
@@ -32,6 +33,20 @@ const pool = mysql.createPool({
   connectionLimit: 10,
   decimalNumbers: true,
   dateStrings: true
+});
+
+app.use('/api', (req, res, next) => {
+  if (!process.env.VERCEL) return next();
+
+  const missing = ['DB_HOST', 'DB_PORT', 'DB_USER', 'DB_PASSWORD', 'DB_NAME']
+    .filter((key) => !process.env[key]);
+  if (process.env.DB_SSL !== 'true') missing.push('DB_SSL=true');
+  if (process.env.DB_SSL === 'true' && !caContent) missing.push('DB_SSL_CA (certificado PEM)');
+
+  if (!missing.length) return next();
+  const message = `Configuración incompleta en Vercel: ${missing.join(', ')}`;
+  console.error(message);
+  return res.status(503).json({ ok: false, error: message });
 });
 
 const handleDbError = (res, error, message) => {
