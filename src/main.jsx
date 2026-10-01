@@ -20,6 +20,51 @@ const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: '
 const dateLabel = new Intl.DateTimeFormat('es-MX', { day: '2-digit', month: 'short', year: 'numeric' });
 const today = () => new Date().toISOString().slice(0, 10);
 const API_BASE = import.meta.env.VITE_API_URL || '';
+const LOCAL_DATA_KEY = 'cafeteria-escolar-data-v1';
+const initialData = {
+  estudiantes: [
+    { id: 1, nombre: 'Ana López', grupo: '1A' },
+    { id: 2, nombre: 'Carlos Ruiz', grupo: '1B' },
+    { id: 3, nombre: 'María Torres', grupo: '2A' },
+    { id: 4, nombre: 'Luis Pérez', grupo: '2B' },
+    { id: 5, nombre: 'Sofía García', grupo: '3A' },
+    { id: 6, nombre: 'Diego Álvarez', grupo: '3B' },
+    { id: 7, nombre: 'Valeria Maya', grupo: '4A' },
+    { id: 8, nombre: 'Bruno Díaz', grupo: '4B' },
+    { id: 9, nombre: 'Chepe', grupo: '6B' }
+  ],
+  productos: [
+    { id: 1, nombre: 'Taco de frijoles', precio: 18 },
+    { id: 2, nombre: 'Refresco', precio: 22.5 },
+    { id: 3, nombre: 'Pan dulce', precio: 12 },
+    { id: 4, nombre: 'Café', precio: 25 },
+    { id: 5, nombre: 'Sandwich', precio: 35 },
+    { id: 6, nombre: 'Agua', precio: 15 },
+    { id: 7, nombre: 'Galletas', precio: 14.5 },
+    { id: 8, nombre: 'Yogur', precio: 20 }
+  ],
+  ventas: []
+};
+
+function readLocalData() {
+  try {
+    const saved = JSON.parse(window.localStorage.getItem(LOCAL_DATA_KEY));
+    if (saved && Array.isArray(saved.estudiantes) && Array.isArray(saved.productos)) {
+      return { ...initialData, ...saved, ventas: Array.isArray(saved.ventas) ? saved.ventas : [] };
+    }
+  } catch {
+    // Use the bundled records when storage is unavailable or invalid.
+  }
+  return initialData;
+}
+
+function persistLocalData(data) {
+  try {
+    window.localStorage.setItem(LOCAL_DATA_KEY, JSON.stringify(data));
+  } catch {
+    // Keep the current session usable when browser storage is disabled.
+  }
+}
 
 function resolveApiUrl(pathname) {
   if (!pathname.startsWith('/')) return pathname;
@@ -55,7 +100,7 @@ async function request(url, options) {
 
 function App() {
   const [activePage, setActivePage] = useState('resumen');
-  const [data, setData] = useState({ estudiantes: [], productos: [], ventas: [] });
+  const [data, setData] = useState(readLocalData);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [connected, setConnected] = useState(false);
@@ -73,7 +118,9 @@ function App() {
         request('/api/productos'),
         request('/api/ventas')
       ]);
-      setData({ estudiantes, productos, ventas });
+      const nextData = { estudiantes, productos, ventas };
+      setData(nextData);
+      persistLocalData(nextData);
       setConnected(true);
     } catch (loadError) {
       setConnected(false);
@@ -104,7 +151,26 @@ function App() {
       setNotice(successMessage);
       await loadData();
     } catch (saveError) {
-      setError(saveError.message);
+      const collection = endpoint === '/api/estudiantes'
+        ? 'estudiantes'
+        : endpoint === '/api/productos'
+          ? 'productos'
+          : null;
+      if (!collection) {
+        setError(saveError.message);
+        return;
+      }
+
+      const record = transform(values);
+      setData((current) => {
+        const id = Math.max(0, ...current[collection].map((item) => Number(item.id) || 0)) + 1;
+        const nextData = { ...current, [collection]: [...current[collection], { id, ...record }] };
+        persistLocalData(nextData);
+        return nextData;
+      });
+      setConnected(false);
+      form.reset();
+      setNotice(`${successMessage} Guardado en este navegador.`);
     } finally {
       setSaving(false);
     }
@@ -123,7 +189,22 @@ function App() {
       setNotice('Registro eliminado.');
       await loadData();
     } catch (removeError) {
-      setError(removeError.message);
+      const match = confirmDelete.endpoint.match(/^\/api\/(estudiantes|productos)\/(\d+)$/);
+      if (!match) {
+        setError(removeError.message);
+      } else {
+        const [, collection, recordId] = match;
+        setData((current) => {
+          const nextData = {
+            ...current,
+            [collection]: current[collection].filter((item) => String(item.id) !== recordId)
+          };
+          persistLocalData(nextData);
+          return nextData;
+        });
+        setConnected(false);
+        setNotice('Registro eliminado de este navegador.');
+      }
     } finally {
       setConfirmDelete(null);
     }
