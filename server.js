@@ -6,14 +6,18 @@ const path = require('node:path');
 require('dotenv').config();
 
 const app = express();
-const PORT = Number(process.env.PORT || 3000);
 
 app.use(express.json());
 
+const caValue = process.env.DB_SSL_CA;
 const ssl = process.env.DB_SSL === 'true'
   ? {
       rejectUnauthorized: true,
-      ...(process.env.DB_SSL_CA ? { ca: fs.readFileSync(process.env.DB_SSL_CA, 'utf8') } : {})
+      ...(caValue ? {
+        ca: caValue.includes('-----BEGIN CERTIFICATE-----')
+          ? caValue.replace(/\\n/g, '\n')
+          : fs.readFileSync(caValue, 'utf8')
+      } : {})
     }
   : undefined;
 
@@ -147,11 +151,4 @@ app.use('/api', (req, res) => res.status(404).json({ ok: false, error: 'Ruta API
 app.use(express.static(path.join(__dirname, 'dist')));
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'dist', 'index.html')));
 
-pool.getConnection((error, connection) => {
-  if (error) {
-    console.error('No se pudo conectar con MySQL:', error.message);
-    process.exit(1);
-  }
-  connection.release();
-  app.listen(PORT, () => console.log(`Cafetería disponible en http://localhost:${PORT}`));
-});
+module.exports = app;
