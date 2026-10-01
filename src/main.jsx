@@ -19,6 +19,13 @@ import '../style.css';
 const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
 const dateLabel = new Intl.DateTimeFormat('es-MX', { day: '2-digit', month: 'short', year: 'numeric' });
 const today = () => new Date().toISOString().slice(0, 10);
+const API_BASE = import.meta.env.VITE_API_URL || '';
+
+function resolveApiUrl(pathname) {
+  if (!pathname.startsWith('/')) return pathname;
+  if (!API_BASE) return pathname;
+  return new URL(pathname, API_BASE).toString();
+}
 
 function clearForm(form) {
   if (!form) return;
@@ -33,9 +40,16 @@ const pages = [
 ];
 
 async function request(url, options) {
-  const response = await fetch(url, options);
+  const apiUrl = resolveApiUrl(url);
+  const response = await fetch(apiUrl, options);
   const body = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(body.error || 'No se pudo completar la solicitud');
+  if (!response.ok) {
+    const message = body.error || `Error ${response.status} en ${apiUrl}`;
+    if (response.status === 404 && !API_BASE) {
+      throw new Error('La API no responde en esta URL. Inicia el backend local en puerto 3000 o configura VITE_API_URL.');
+    }
+    throw new Error(message);
+  }
   return body;
 }
 
