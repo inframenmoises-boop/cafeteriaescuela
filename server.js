@@ -40,8 +40,9 @@ app.use('/api', (req, res, next) => {
 
   const missing = ['DB_HOST', 'DB_PORT', 'DB_USER', 'DB_PASSWORD', 'DB_NAME']
     .filter((key) => !process.env[key]);
-  if (process.env.DB_SSL !== 'true') missing.push('DB_SSL=true');
-  if (process.env.DB_SSL === 'true' && !caContent) missing.push('DB_SSL_CA (certificado PEM)');
+
+  const sslEnabled = process.env.DB_SSL === 'true';
+  if (sslEnabled && !caContent) missing.push('DB_SSL_CA (certificado PEM)');
 
   if (!missing.length) return next();
   const message = `Configuración incompleta en Vercel: ${missing.join(', ')}`;
