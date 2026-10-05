@@ -89,11 +89,10 @@ async function request(url, options) {
   const response = await fetch(apiUrl, options);
   const body = await response.json().catch(() => ({}));
   if (!response.ok) {
-    const message = body.error || `Error ${response.status} en ${apiUrl}`;
-    if (response.status === 404 && !API_BASE) {
+    if (response.status === 404 && !API_BASE && !body.error) {
       throw new Error('La API no responde en esta URL. Inicia el backend local en puerto 3000 o configura VITE_API_URL.');
     }
-    throw new Error(message);
+    throw new Error(body.error || `Error ${response.status} en ${apiUrl}`);
   }
   return body;
 }
