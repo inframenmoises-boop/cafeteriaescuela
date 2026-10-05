@@ -256,6 +256,9 @@ function App() {
           </button>
         </div>
 
+        {error && <div className="notice notice--error" role="alert">{error}</div>}
+        {notice && <div className="notice notice--success" role="status">{notice}</div>}
+
         {loading && !data.productos.length && !data.estudiantes.length ? (
           <div className="loading-state"><LoaderCircle className="spin" size={28} /><span>Conectando con la cafetería...</span></div>
         ) : (

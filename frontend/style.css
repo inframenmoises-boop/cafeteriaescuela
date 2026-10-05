@@ -415,7 +415,13 @@ button {
 }
 
 .notice {
-  display: none !important;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border: 1px solid transparent;
+  border-radius: 6px;
 }
 
 .notice button {
