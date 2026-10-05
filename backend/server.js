@@ -164,7 +164,5 @@ app.delete('/api/ventas/:id', (req, res) => {
 });
 
 app.use('/api', (req, res) => res.status(404).json({ ok: false, error: 'Ruta API no encontrada' }));
-app.use(express.static(path.join(__dirname, 'dist')));
-app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'dist', 'index.html')));
 
 module.exports = app;
